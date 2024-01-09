@@ -81,14 +81,46 @@ describe('ReviewsController', () => {
 	});
 
 	describe('getReviews()', () => {
-		it.todo('should fetch all reviews');
+		it('should fetch all reviews', async () => {
+			const response = await request(app.getHttpServer()).get('/reviews');
+			expect(response.status).toBe(200);
+			expect(response.body.reviews).toHaveLength(3);
+		});
 
-		it.todo('should fetch reviews in descending order by date');
+		it('should fetch reviews in descending order by date', async () => {
+			const response = await request(app.getHttpServer()).get('/reviews');
 
-		it.todo('should include user data with review');
+			const reviews = response.body.reviews;
+			const date1 = new Date(reviews[0].createdOn);
+			const date2 = new Date(reviews[1].createdOn);
+			const date3 = new Date(reviews[2].createdOn);
 
-		it.todo('should include company data with review');
+			expect(date1).toBeInstanceOf(Date);
+			expect(date2).toBeInstanceOf(Date);
+			expect(date3).toBeInstanceOf(Date);
 
-		// Feel free to add any additional tests you think are necessary
+			expect(date1.getTime()).toBeGreaterThanOrEqual(date2.getTime());
+			expect(date2.getTime()).toBeGreaterThanOrEqual(date3.getTime());
+		});
+
+		it('should include user data with review', async () => {
+			const response = await request(app.getHttpServer()).get('/reviews');
+			const firstReview = response.body.reviews[0];
+
+			expect(firstReview.user).toBeDefined();
+			expect(firstReview.user.id).toBeDefined();
+			expect(firstReview.user.email).toBeDefined();
+			expect(firstReview.user.firstName).toBeDefined();
+			expect(firstReview.user.lastName).toBeDefined();
+		});
+
+		it('should include company data with review', async () => {
+			const response = await request(app.getHttpServer()).get('/reviews');
+			const firstReview = response.body.reviews[0];
+
+			expect(firstReview.company).toBeDefined();
+			expect(firstReview.company.id).toBeDefined();
+			expect(firstReview.company.name).toBeDefined();
+		});
 	});
 });
